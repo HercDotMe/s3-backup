@@ -1,5 +1,7 @@
 #!/bin/bash
 
+DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # Create temporary file store directory
 mkdir -p ~/.s3-backups
 
@@ -45,7 +47,7 @@ fi
 for f in $1/*; do
   if [ -d "$f" ]; then
     echo "Creating backup for '$f' ..."
-    ./s3-backup $f $2 $f >/dev/null
+    $DIR/s3-backup $f $2 $f >/dev/null
   fi
 done
 
