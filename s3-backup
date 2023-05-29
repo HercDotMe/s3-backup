@@ -20,4 +20,6 @@ then
 fi
 
 #Check aws cli is logged in
-aws iam get-login-profile
+if aws sts get-caller-identity | grep -q 'Unable to locate credentials.'; then
+  echo "AWS CLI is not logged in"
+fi
