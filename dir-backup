@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Create temporary file store directory
+mkdir -p ~/.s3-backups
+
+# Check required utilities exist
+if ! command -v zip &>/dev/null; then
+  echo "ZIP could not be found"
+  exit 1
+fi
+
+if ! command -v unzip &>/dev/null; then
+  echo "UnZIP could not be found"
+  exit 1
+fi
+
+if ! command -v aws &>/dev/null; then
+  echo "AWS CLI could not be found"
+  exit 1
+fi
+
+# Check aws cli is logged in
+LOGIN_MSG=$(aws sts get-caller-identity 2>&1)
+if [[ "$LOGIN_MSG" == *"Unable to locate credentials."* ]]; then
+  echo "Could not find AWS CLI Credentials"
+  aws configure
+fi
+
+# Check path exists and is directory
+if [ -d $1 ]; then
+  echo "Directory '$1' found ..."
+else
+  echo "Error: Directory '$1' does not exists!"
+  exit 2
+fi
+
+# Check bucket exists
+if aws s3api head-bucket --bucket "$2" 2>/dev/null; then
+  echo "Bucket exists ..."
+else
+  echo "Error: Bucket missing!"
+fi
+
+# Select sub directories
+for f in $1/*; do
+  if [ -d "$f" ]; then
+    echo "Creating backup for '$f' ..."
+    ./s3-backup $f $2 $f >/dev/null
+  fi
+done
+
+echo "Complete!"
