@@ -1,24 +1,61 @@
 #!/bin/bash
 
-#Check required utilities exist
-if ! command -v zip &> /dev/null
-then
-    echo "ZIP could not be found"
-    exit
+# Create temporary file store directory
+mkdir -p ~/.s3-backups
+
+# Check required utilities exist
+if ! command -v zip &>/dev/null; then
+  echo "ZIP could not be found"
+  exit 1
 fi
 
-if ! command -v unzip &> /dev/null
-then
-    echo "UnZIP could not be found"
-    exit
+if ! command -v unzip &>/dev/null; then
+  echo "UnZIP could not be found"
+  exit 1
 fi
 
-if ! command -v aws &> /dev/null
-then
-    echo "AWS CLI could not be found"
-    exit
+if ! command -v aws &>/dev/null; then
+  echo "AWS CLI could not be found"
+  exit 1
 fi
 
-#Check aws cli is logged in
-login=`aws sts get-caller-identity 2>&1`
-echo login
+# Check aws cli is logged in
+LOGIN_MSG=$(aws sts get-caller-identity 2>&1)
+if [[ "$LOGIN_MSG" == *"Unable to locate credentials."* ]]; then
+  echo "Could not find AWS CLI Credentials"
+  aws configure
+fi
+
+# Check path exists and is directory
+if [ -d $1 ]; then
+  echo "Directory '$1' found ..."
+else
+  echo "Error: Directory '$1' does not exists!"
+  exit 2
+fi
+
+# Check bucket exists
+if aws s3api head-bucket --bucket "$2" 2>/dev/null; then
+  echo "Bucket exists ..."
+else
+  echo "Error: Bucket missing!"
+  exit 2
+fi
+
+# Create ZIP file
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
+DIRECTORY_NAME=$(basename $1)
+ZIP_NAME="${DIRECTORY_NAME}_${TIMESTAMP}.zip"
+echo "Creating ZIP file '~/.s3-backups/$ZIP_NAME' ..."
+zip -rq ~/.s3-backups/$ZIP_NAME $1
+echo "ZIP created ..."
+
+# Upload ZIP file
+BUCKET_PATH=$(realpath -s $3)
+BUCKET_PATH=$BUCKET_PATH/$ZIP_NAME
+echo "Uploading ZIP file to 's3://${2}${BUCKET_PATH}' ..."
+aws s3 cp ~/.s3-backups/$ZIP_NAME s3://${2}${BUCKET_PATH} --quiet
+echo "ZIP file uploaded!"
+
+# Cleanup
+rm ~/.s3-backups/$ZIP_NAME

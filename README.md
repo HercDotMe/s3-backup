@@ -16,4 +16,4 @@ S3 specified bucket then remove the local ZIP archive to reduce disk space usage
 
 ### Usage
 
-`s3-backup <local_directory> <region> <bucket_name>`
+`s3-backup <local_directory> <bucket_name> <bucket_path>`
