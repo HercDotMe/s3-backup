@@ -12,7 +12,6 @@ S3 specified bucket then remove the local ZIP archive to reduce disk space usage
 ### Installation
 
 - Clone this repository in home directory
-- Copy the [s3-backup](s3-backup) file under `/usr/local/bin` path
 
 ### Usage
 
