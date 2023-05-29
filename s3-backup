@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#Check required utilities exist
+if ! command -v zip &> /dev/null
+then
+    echo "ZIP could not be found"
+    exit
+fi
+
+if ! command -v unzip &> /dev/null
+then
+    echo "UnZIP could not be found"
+    exit
+fi
+
+if ! command -v aws &> /dev/null
+then
+    echo "AWS CLI could not be found"
+    exit
+fi
+
+#Check aws cli is logged in
+aws iam get-login-profile
