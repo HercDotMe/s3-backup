@@ -44,7 +44,7 @@ fi
 for f in $1/*; do
   if [ -d "$f" ]; then
     echo "Creating backup for '$f' ..."
-    $DIR/s3-backup $f $2 $f >/dev/null
+    $DIR/s3-backup $f $2 $3 >/dev/null
   fi
 done
 
