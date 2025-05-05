@@ -2,9 +2,6 @@
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Create temporary file store directory
-mkdir -p ~/.s3-backups
-
 # Check required utilities exist
 if ! command -v zip &>/dev/null; then
   echo "ZIP could not be found"

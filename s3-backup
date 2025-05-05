@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Create temporary file store directory
-mkdir -p ~/.s3-backups
-
 # Check required utilities exist
 if ! command -v zip &>/dev/null; then
   echo "ZIP could not be found"
@@ -42,6 +39,9 @@ else
   exit 2
 fi
 
+# Create temporary file store directory
+mkdir -p ~/.s3-backups
+
 # Create ZIP file
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
 DIRECTORY_NAME=$(basename $1)
@@ -59,3 +59,4 @@ echo "ZIP file uploaded!"
 
 # Cleanup
 rm ~/.s3-backups/$ZIP_NAME
+rm -rf ~/.s3-backups
